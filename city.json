@@ -1,0 +1,206 @@
+{
+  "schema_version": "1.1",
+  "is_sample": true,
+  "city": {
+    "name": "Zagreb",
+    "country": "Croatia",
+    "subdomain": "zagreb",
+    "type": "city",
+    "joined_year": 2015,
+    "differential": "Six labs, one loop: Zagreb turns its textile and plastic waste into public products, from school workwear to street furniture.",
+    "description": "Fab City Zagreb connects the city's fab labs, university workshops and manufacturers into one production ecosystem. The current focus: textile circularity, distributed plastic recycling and open environmental data, coordinated from Fablab Zagreb with the City's Office for Economy.",
+    "hero_image": "assets/hero.jpg"
+  },
+  "contact": {
+    "email": "zagreb@fab.city",
+    "social": [
+      { "label": "Instagram", "url": "https://www.instagram.com/fabcityzagreb" },
+      { "label": "LinkedIn", "url": "https://www.linkedin.com/company/fab-city-zagreb" }
+    ]
+  },
+  "analytics": { "plausible_domain": "", "privacy_url": "" },
+  "data_snapshot": [
+    { "label": "Fab labs and makerspaces", "value": "6" },
+    { "label": "Organizations in the ecosystem", "value": "14" },
+    { "label": "Active projects", "value": "9" },
+    { "label": "People involved", "value": "120+" },
+    { "label": "Tonnes of waste remade in 2025", "value": "38" },
+    { "label": "Repair café sessions held", "value": "31" }
+  ],
+  "ecosystem": [
+    {
+      "name": "Fablab Zagreb",
+      "type": "Fab Lab",
+      "summary": "Digital fabrication lab at the Faculty of Mechanical Engineering; runs the city's open machine park and the Fab Academy node.",
+      "url": "https://fablab.hr",
+      "lat": 45.7946,
+      "lng": 15.9712,
+      "logo": ""
+    },
+    {
+      "name": "Radiona",
+      "type": "Makerspace",
+      "summary": "Makerspace and DIY-culture association running electronics, new-media art and the monthly repair café since 2011.",
+      "url": "https://radiona.org",
+      "lat": 45.8025,
+      "lng": 15.9893,
+      "logo": ""
+    },
+    {
+      "name": "ZICER",
+      "type": "Innovation hub",
+      "summary": "Zagreb Innovation Centre at the Zagreb Fair; hosts hardware startups and the city's prototyping fund.",
+      "url": "https://www.zicer.hr",
+      "lat": 45.7789,
+      "lng": 15.9672,
+      "logo": ""
+    },
+    {
+      "name": "REGEA",
+      "type": "Energy agency",
+      "summary": "North-West Croatia Regional Energy Agency; pilots building retrofits and solar co-ownership with the city.",
+      "url": "https://www.regea.org",
+      "lat": 45.8041,
+      "lng": 15.9498,
+      "logo": ""
+    },
+    {
+      "name": "FER, University of Zagreb",
+      "type": "University lab",
+      "summary": "Faculty of Electrical Engineering and Computing; builds the open sensor platform behind the air-quality network.",
+      "url": "https://www.fer.unizg.hr",
+      "lat": 45.8008,
+      "lng": 15.9713,
+      "logo": ""
+    },
+    {
+      "name": "Zelena akcija",
+      "type": "NGO",
+      "summary": "Friends of the Earth Croatia; runs the reuse depot and drafted the city's zero-waste plan.",
+      "url": "https://zelena-akcija.hr",
+      "lat": 45.813,
+      "lng": 15.969,
+      "logo": ""
+    },
+    {
+      "name": "City of Zagreb — Office for Economy",
+      "type": "City partner",
+      "summary": "Co-funds the Textile Loop and opens public buildings to Fab City pilots.",
+      "url": "https://www.zagreb.hr",
+      "lat": 45.8005,
+      "lng": 15.9658,
+      "logo": ""
+    }
+  ],
+  "projects": [
+    {
+      "title": "Zagreb Textile Loop",
+      "status": "Active",
+      "summary": "Collection points in Trešnjevka and Dubrava feed a sorting studio where local designers remake post-consumer textiles into workwear and school gear. 4.2 tonnes processed since January.",
+      "partners": ["Fablab Zagreb", "Zelena akcija", "City of Zagreb"],
+      "image": "assets/project-1.jpg",
+      "url": ""
+    },
+    {
+      "title": "Precious Plastic Zagreb",
+      "status": "Active",
+      "summary": "A distributed network of shredders and sheet presses turns collected HDPE into benches and planters, now installed on two pilot squares.",
+      "partners": ["Radiona", "ZICER"],
+      "image": "assets/project-2.jpg",
+      "url": "https://preciousplastic.com"
+    },
+    {
+      "title": "Open Air Zagreb",
+      "status": "Active",
+      "summary": "42 open-hardware sensors publish street-level air data; residents solder their own units at monthly Radiona workshops.",
+      "partners": ["FER, University of Zagreb", "Radiona"],
+      "image": "",
+      "url": ""
+    },
+    {
+      "title": "School Fab Labs",
+      "status": "Pilot",
+      "summary": "Mobile fabrication kits rotate through five primary schools; the first cohort of 60 teachers is trained and teaching repair and digital making.",
+      "partners": ["Fablab Zagreb", "City of Zagreb"],
+      "image": "",
+      "url": ""
+    }
+  ],
+  "news": [
+    {
+      "date": "2026-07-28",
+      "title": "Textile Loop opens its second collection point in Dubrava",
+      "summary": "Drop-offs now come from two districts; sorting capacity doubles to 800 kg a week.",
+      "url": ""
+    },
+    {
+      "date": "2026-06-19",
+      "title": "Recycled-plastic benches installed on two squares",
+      "summary": "Precious Plastic Zagreb delivered twelve benches and planters pressed from city-collected HDPE.",
+      "url": ""
+    },
+    {
+      "date": "2026-05-12",
+      "title": "Sixty teachers finish the School Fab Labs training",
+      "summary": "All five pilot schools now run weekly repair and digital-making classes.",
+      "url": ""
+    },
+    {
+      "date": "2026-04-02",
+      "title": "Zagreb publishes its first local-production snapshot",
+      "summary": "Six months of data from the textile and plastic loops, now feeding the network dashboard on fab.city.",
+      "url": ""
+    },
+    {
+      "date": "2026-02-17",
+      "title": "Open Air Zagreb passes 40 live sensors",
+      "summary": "Street-level air data is now dense enough to compare all city districts.",
+      "url": ""
+    }
+  ],
+  "events": [
+    {
+      "date": "2026-09-12",
+      "title": "Open day at Fablab Zagreb",
+      "venue": "Faculty of Mechanical Engineering, Ivana Lučića 5",
+      "url": "https://fablab.hr"
+    },
+    {
+      "date": "2026-10-08",
+      "title": "Repair café #32",
+      "venue": "Radiona makerspace",
+      "url": ""
+    },
+    {
+      "date": "2026-11-19",
+      "title": "Fab City Zagreb quarterly assembly",
+      "venue": "ZICER, Zagreb Fair",
+      "url": ""
+    },
+    {
+      "date": "2026-06-14",
+      "title": "Repair café #31",
+      "venue": "Radiona makerspace",
+      "url": ""
+    },
+    {
+      "date": "2026-05-09",
+      "title": "Textile Loop sorting studio open tour",
+      "venue": "Sorting studio, Trešnjevka",
+      "url": ""
+    },
+    {
+      "date": "2026-03-21",
+      "title": "Open Air sensor build day",
+      "venue": "FER, Unska 3",
+      "url": ""
+    }
+  ],
+  "ui_labels": {
+    "nav_ecosystem": "Ecosystem",
+    "nav_projects": "Projects",
+    "nav_news": "News",
+    "nav_events": "Events",
+    "part_of_network": "Part of the Fab City Network"
+  }
+}

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fab City Network — city page</title>
+<meta name="description" content="A city in the Fab City Network: locally productive, globally connected.">
+
+<!-- ── SOCIAL SHARING (the only sanctioned edit in this file) ──────────
+     Cities MAY edit the three og: values below for nicer link previews
+     (use an ABSOLUTE url for og:image, e.g. https://yourcity.fab.city/assets/hero.jpg).
+     Everything else in index.html is managed by the Fab City Foundation. -->
+<meta property="og:title" content="Fab City Network — city page">
+<meta property="og:description" content="Part of the Fab City Network: cities producing (almost) everything they consume by 2054.">
+<meta property="og:image" content="assets/hero.jpg">
+<!-- ───────────────────────────────────────────────────────────────── -->
+
+<style>
+/* ════════════════════════════════════════════════════════════════════
+   FAB CITY IDENTITY TOKENS — 2026 Core Guidelines.
+   Fixed across all city sites. Exactly five colors, two typefaces.
+   The single city color is set at runtime from city.json → theme.color.
+   ════════════════════════════════════════════════════════════════════ */
+:root{
+  --fab-black:    #1E1E1E;   /* primary logo, key typography, nav */
+  --fab-offwhite: #F7F5F1;   /* the page background — never pure white */
+  --fab-red:      #E62038;   /* the three Fab City colors — a site   */
+  --fab-green:    #00A057;   /*   uses exactly ONE, monochromatically */
+  --fab-blue:     #20388D;
+
+  --city: var(--fab-red);   /* ← set at runtime from city.type: red city / green region / black country / blue island */
+
+  /* derived ink applications (FAB Black at reduced opacity only) */
+  --ink-muted: rgba(30,30,30,.72);
+  --line:      rgba(30,30,30,.16);
+  --grid-line: rgba(30,30,30,.05);
+
+  /* typography */
+  --font-display: "Funnel Sans",-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --font-text:    "Funnel Sans",-apple-system,"Helvetica Neue",Arial,sans-serif;
+
+  /* spacing scale (8px module grid) */
+  --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:96px;
+  --maxw:1200px;
+
+  /* FC-Module geometry */
+  --hexclip: polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  --cut-a: polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,26px 100%,0 calc(100% - 26px));
+  --cut-b: polygon(26px 0,100% 0,100% calc(100% - 26px),calc(100% - 26px) 100%,0 100%,0 26px);
+  --cut-sm: polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+}
+
+/* Font: Funnel Sans, SIL Open Font License 1.1 — see assets/fonts/OFL.txt */
+@font-face{
+  font-family:"Funnel Sans";
+  src:url("assets/fonts/FunnelSans.ttf") format("truetype-variations"),
+      url("assets/fonts/FunnelSans.ttf") format("truetype");
+  font-weight:300 800;font-style:normal;font-display:swap;
+}
+
+/* ── base ─────────────────────────────────────────────────────────── */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:110px}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{
+  margin:0;background:var(--fab-offwhite);color:var(--fab-black);
+  font:16px/1.55 var(--font-text);font-weight:400;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+img{display:block;max-width:100%}
+[hidden]{display:none!important}
+h1,h2{font-family:var(--font-display);font-weight:500;line-height:1.06;margin:0}
+h3{font-family:var(--font-text);font-weight:600;line-height:1.2;margin:0}
+p{margin:0}
+a{color:var(--fab-black);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+a:hover{color:var(--fab-black);text-decoration-color:var(--city);text-decoration-thickness:2px}
+::selection{background:var(--city);color:var(--fab-offwhite)}
+:focus-visible{outline:2px solid var(--fab-black);outline-offset:2px}
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(20px,4.5vw,48px)}
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link{position:fixed;top:-60px;left:16px;z-index:100;background:var(--fab-black);color:var(--fab-offwhite);padding:10px 16px;font:600 13px var(--font-text);text-decoration:none;transition:top .15s}
+.skip-link:focus{top:12px;color:var(--fab-offwhite)}
+
+/* tags */
+.tag{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(30,30,30,.8);padding:6px 10px 5px;font:600 11px/1 var(--font-text);letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;color:var(--fab-black)}
+.tag--city{border-color:var(--city)}
+.hexdot{width:9px;height:10px;flex:none}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 24px;font:700 13.5px/1 var(--font-text);letter-spacing:.05em;text-transform:uppercase;text-decoration:none;transition:transform .16s ease}
+.btn .arr{transition:transform .16s ease}
+.btn:hover .arr{transform:translateX(3px)}
+.btn-solid{background:var(--fab-black);color:var(--fab-offwhite);clip-path:var(--cut-sm)}
+.btn-solid:hover{color:var(--fab-offwhite);text-decoration:none}
+.btn-ghost{border:1.5px solid var(--fab-black);color:var(--fab-black)}
+.btn-ghost:hover{text-decoration:none}
+.btn:hover{transform:translateY(-2px)}
+
+/* ── header ───────────────────────────────────────────────────────── */
+#site-header{position:sticky;top:0;z-index:50;background:var(--fab-offwhite);border-bottom:1px solid var(--line)}
+.header-in{display:flex;align-items:center;gap:clamp(16px,3vw,40px);min-height:72px;padding-block:10px;flex-wrap:wrap}
+.lockup-link{display:inline-flex;text-decoration:none;flex:none}
+.lockup-link svg{height:48px;width:auto;display:block}
+#site-nav{display:flex;gap:clamp(14px,2.2vw,28px);margin-left:auto;overflow-x:auto;scrollbar-width:none}
+#site-nav::-webkit-scrollbar{display:none}
+#site-nav a{font:600 12.5px/1 var(--font-text);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;padding:10px 1px;border-bottom:2px solid transparent;white-space:nowrap}
+#site-nav a:hover{border-bottom-color:var(--city)}
+.fabcity-word{font-family:var(--font-display);font-weight:500;font-size:13.5px;letter-spacing:.16em;text-decoration:none;flex:none}
+.fabcity-word:hover{text-decoration:underline;text-decoration-color:var(--city);text-decoration-thickness:2px}
+@media (max-width:880px){
+  html{scroll-padding-top:150px}
+  .header-in{row-gap:0}
+  #site-nav{order:3;flex-basis:100%;margin-left:0;border-top:1px solid var(--line)}
+  .fabcity-word{margin-left:auto}
+}
+
+/* ── sample ribbon ────────────────────────────────────────────────── */
+#ribbon{position:fixed;z-index:90;bottom:38px;right:-104px;transform:rotate(-45deg);background:var(--fab-black);color:var(--fab-offwhite);font:600 10px/1.4 var(--font-text);letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:8px 96px;pointer-events:none;max-width:440px}
+@media (max-width:880px){#ribbon{font-size:9px;bottom:30px;right:-110px;padding:6px 100px}}
+
+/* ── hero ─────────────────────────────────────────────────────────── */
+#hero{
+  padding-block:clamp(48px,7vw,92px);
+  background-image:
+    repeating-linear-gradient(90deg,var(--grid-line) 0 1px,transparent 1px 64px),
+    repeating-linear-gradient(60deg,var(--grid-line) 0 1px,transparent 1px 64px),
+    repeating-linear-gradient(-60deg,var(--grid-line) 0 1px,transparent 1px 64px);
+}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(36px,5vw,72px);align-items:center}
+.tags-row{display:flex;flex-wrap:wrap;gap:10px}
+.hero-name{font-size:clamp(54px,9vw,124px);letter-spacing:-.015em;line-height:.96;margin-top:22px;overflow-wrap:anywhere}
+.hero-differential{font-family:var(--font-display);font-weight:500;font-size:clamp(23px,2.9vw,38px);line-height:1.18;letter-spacing:-.01em;margin-top:26px;max-width:24ch;text-wrap:pretty}
+.hero-desc{margin-top:20px;font-size:16.5px;color:var(--ink-muted);max-width:54ch;text-wrap:pretty}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.hero-visual{position:relative;aspect-ratio:.866;width:min(100%,440px);justify-self:end}
+.hex-back{position:absolute;inset:0;background:var(--city);clip-path:var(--hexclip);transform:translate(7%,6%)}
+.hex-img,.hex-ph{position:absolute;inset:0;width:100%;height:100%;clip-path:var(--hexclip)}
+.hex-img{object-fit:cover}
+.hex-ph{background:var(--city);display:grid;place-items:center;color:var(--fab-offwhite);font:500 clamp(64px,8vw,110px) var(--font-display)}
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .hero-visual{justify-self:center;width:min(100%,340px)}
+}
+
+/* ── data snapshot ────────────────────────────────────────────────── */
+#data{padding-block:0 clamp(48px,7vw,84px)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:18px}
+.stat-module{background:var(--city);clip-path:var(--cut-a);min-height:132px;display:grid;place-items:center;padding:26px 12px}
+.stat:nth-child(even) .stat-module{clip-path:var(--cut-b)}
+.stat-value{font:500 clamp(42px,4vw,58px)/1 var(--font-display);letter-spacing:-.02em;color:var(--fab-offwhite)}
+.stat-label{display:block;margin-top:11px;font:600 11px/1.45 var(--font-text);letter-spacing:.08em;text-transform:uppercase;color:var(--fab-black)}
+
+/* ── sections ─────────────────────────────────────────────────────── */
+.section{border-top:1px solid var(--line);padding-block:clamp(52px,7vw,88px)}
+.sec-head{margin-bottom:clamp(28px,4vw,44px);display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(34px,4.4vw,52px);letter-spacing:-.01em}
+.sec-head h2::after{content:".";color:var(--city)}
+
+/* ecosystem */
+.org-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:18px}
+.org-card{border:1px solid var(--line);padding:22px;display:flex;flex-direction:column;background:var(--fab-offwhite);transition:transform .16s ease,border-color .16s ease}
+.org-card:hover{transform:translateY(-3px);border-color:var(--city)}
+.org-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.org-mark{position:relative;width:42px;height:48px;flex:none}
+.org-mark .ph-hex{position:absolute;inset:0;clip-path:var(--hexclip);background:var(--city);display:grid;place-items:center;color:var(--fab-offwhite);font:500 15px var(--font-display);letter-spacing:.02em}
+.org-mark img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--fab-offwhite)}
+.org-name{font-size:19px;line-height:1.15}
+.org-sum{margin-top:8px;font-size:14px;line-height:1.5;color:var(--ink-muted);flex-grow:1}
+.more-link{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font:700 11.5px/1 var(--font-text);letter-spacing:.09em;text-transform:uppercase;text-decoration:none}
+.more-link .arr{color:var(--city);transition:transform .16s ease}
+.more-link:hover .arr{transform:translateX(3px)}
+.more-link:hover{text-decoration:underline;text-decoration-color:var(--city);text-decoration-thickness:2px}
+
+/* projects */
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.proj-card{border:1px solid var(--line);display:flex;flex-direction:column;transition:transform .16s ease,border-color .16s ease}
+.proj-card:hover{transform:translateY(-3px);border-color:var(--city)}
+.proj-media{position:relative;aspect-ratio:16/9.6;margin:14px 14px 0}
+.proj-media img,.proj-media .ph-cut{position:absolute;inset:0;width:100%;height:100%;clip-path:var(--cut-a)}
+.proj-media img{object-fit:cover}
+.proj-media .ph-cut{background:var(--city);display:grid;place-items:center;color:var(--fab-offwhite);font:500 44px var(--font-display)}
+.proj-body{padding:20px 22px 24px;display:flex;flex-direction:column;flex-grow:1}
+.proj-title{font-size:21px;margin-top:14px}
+.proj-sum{margin-top:9px;font-size:14px;line-height:1.5;color:var(--ink-muted)}
+.proj-partners{margin-top:14px;font:600 11px/1.6 var(--font-text);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted);flex-grow:1}
+.proj-body .more-link{margin-top:18px}
+
+/* news */
+.news-list{list-style:none;margin:0;padding:0;max-width:860px}
+.news-item{display:grid;grid-template-columns:118px 1fr;gap:20px;padding-block:20px;border-top:1px solid var(--line)}
+.news-item:first-child{border-top:0;padding-top:0}
+.news-date{font:600 12px/1.6 var(--font-text);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted);padding-top:4px}
+.news-title{font-size:20px;line-height:1.2}
+.news-title a{text-decoration:none}
+.news-title a:hover{text-decoration:underline;text-decoration-color:var(--city);text-decoration-thickness:2px}
+.news-sum{margin-top:5px;font-size:14.5px;color:var(--ink-muted);max-width:62ch}
+@media (max-width:640px){.news-item{grid-template-columns:1fr;gap:4px}}
+
+/* events */
+.events-list{list-style:none;margin:0;padding:0;max-width:860px}
+.event-item{display:flex;align-items:center;gap:22px;padding-block:18px;border-top:1px solid var(--line)}
+.event-item:first-child{border-top:0;padding-top:0}
+.event-date{flex:none;width:64px;text-align:center}
+.hexday{display:grid;place-items:center;width:56px;height:64px;margin-inline:auto;clip-path:var(--hexclip);background:var(--city);color:var(--fab-offwhite);font:500 24px var(--font-display)}
+.event-mon{display:block;margin-top:6px;font:700 10px/1 var(--font-text);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)}
+.event-info{flex-grow:1}
+.event-title{font-size:19px;line-height:1.2}
+.event-venue{margin-top:4px;font-size:13.5px;color:var(--ink-muted)}
+.event-item .more-link{margin-top:0;flex:none}
+
+/* ── view switches, ecosystem map, events calendar ── */
+.viewswitch{display:flex;border:1px solid var(--fab-black);flex:none}
+.viewswitch button{appearance:none;background:none;border:0;border-left:1px solid var(--fab-black);margin:0;padding:9px 14px 8px;font:700 11px/1 var(--font-text);letter-spacing:.09em;text-transform:uppercase;color:var(--fab-black);cursor:pointer}
+.viewswitch button:first-child{border-left:0}
+.viewswitch button[aria-pressed="true"]{background:var(--fab-black);color:var(--fab-offwhite)}
+.linkbtn{appearance:none;background:none;border:0;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font:700 11.5px/1 var(--font-text);letter-spacing:.09em;text-transform:uppercase;color:var(--fab-black)}
+.linkbtn:hover{text-decoration:underline;text-decoration-color:var(--city);text-decoration-thickness:2px}
+#eco-map{height:clamp(360px,52vh,540px);border:1px solid var(--fab-black)}
+#eco-map[hidden]{display:none}
+.hexpin{background:none;border:0}
+.map-fail{padding:24px;font-size:14px;color:var(--ink-muted)}
+.leaflet-container{font-family:var(--font-text)}
+.leaflet-popup-content-wrapper{background:var(--fab-offwhite);color:var(--fab-black);border:1px solid var(--fab-black);border-radius:0;box-shadow:4px 4px 0 rgba(30,30,30,.18)}
+.leaflet-popup-content{margin:16px 18px}
+.leaflet-popup-content .more-link{color:var(--fab-black)}
+.leaflet-popup-tip{background:var(--fab-offwhite)}
+.pop-name{font:600 15px/1.25 var(--font-text);margin:8px 0 0}
+.pop-card .more-link{margin-top:12px}
+a.leaflet-popup-close-button{color:var(--fab-black)!important}
+.ev-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;max-width:860px}
+.cal-title{font-family:var(--font-display);font-weight:500;font-size:clamp(19px,2.4vw,24px);letter-spacing:-.01em;margin:0}
+.cal-nav{display:flex;align-items:center;gap:10px}
+.cal-nav .navbtn{appearance:none;background:none;border:1px solid var(--fab-black);width:34px;height:34px;display:grid;place-items:center;font:500 15px/1 var(--font-text);color:var(--fab-black);cursor:pointer}
+.cal-nav .navbtn:hover{background:var(--fab-black);color:var(--fab-offwhite)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);max-width:860px;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.cal-dow{padding:9px 8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font:700 10px/1 var(--font-text);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted)}
+.cal-cell{min-height:70px;padding:7px 8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);font:500 13px/1 var(--font-text)}
+.cal-cell.out{color:rgba(30,30,30,.28)}
+.cal-cell .d{display:inline-grid;place-items:center;min-width:24px;height:27px}
+.cal-cell.today .d{clip-path:var(--hexclip);background:var(--fab-black);color:var(--fab-offwhite)}
+.cal-cell.has .d{clip-path:var(--hexclip);background:var(--city);color:var(--fab-offwhite)}
+.cal-chip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;font:600 10.5px/1.35 var(--font-text);letter-spacing:.02em;color:var(--city)}
+.cal-empty{padding:18px 0;font-size:14px;color:var(--ink-muted)}
+@media (max-width:640px){.cal-cell{min-height:46px;padding:5px 6px}.cal-chip{display:none}}
+
+/* ── footer ───────────────────────────────────────────────────────── */
+#site-footer{background:var(--fab-black);color:var(--fab-offwhite);margin-top:clamp(40px,6vw,72px)}
+#site-footer .footer-grid{display:grid;grid-template-columns:1.2fr .8fr 1fr;gap:clamp(32px,5vw,64px);padding-block:clamp(48px,6vw,76px) 0}
+#lockup-footer svg{height:176px;width:auto;display:block}
+.claim{margin-top:22px;font-size:15px;line-height:1.5;max-width:26ch;color:rgba(247,245,241,.85)}
+.f-col h3{font:700 11px/1 var(--font-text);letter-spacing:.14em;text-transform:uppercase;color:rgba(247,245,241,.55);margin:6px 0 18px}
+.f-col a{display:block;color:var(--fab-offwhite);text-decoration:none;font-size:15px;padding-block:5px}
+.f-col a:hover{color:var(--fab-offwhite);text-decoration:underline;text-decoration-color:rgba(247,245,241,.7);text-decoration-thickness:2px}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:clamp(36px,5vw,56px);padding-block:22px 26px;border-top:1px solid rgba(247,245,241,.18)}
+.footer-bottom p{font-size:13px;color:rgba(247,245,241,.75)}
+.footer-bottom a{color:var(--fab-offwhite);text-decoration:underline;text-decoration-color:rgba(247,245,241,.4);text-underline-offset:3px}
+.footer-bottom a:hover{color:var(--fab-offwhite);text-decoration-color:var(--fab-offwhite)}
+.footer-bottom .fabcity-word{color:var(--fab-offwhite);letter-spacing:.18em;font-size:12.5px}
+@media (max-width:840px){#site-footer .footer-grid{grid-template-columns:1fr}}
+
+/* ── error card ───────────────────────────────────────────────────── */
+#error-view{min-height:64vh;display:grid;place-items:center;padding:clamp(24px,6vw,64px)}
+#error-view[hidden]{display:none}
+.error-card{max-width:540px;border:1.5px solid var(--fab-black);padding:clamp(28px,5vw,44px);background:var(--fab-offwhite)}
+.error-card svg{height:52px;width:auto;margin-bottom:22px}
+.error-card h1{font-size:24px;line-height:1.2}
+.error-card p{margin-top:12px;font-size:14.5px;color:var(--ink-muted)}
+.error-card code{font-size:12.5px;background:rgba(30,30,30,.07);padding:2px 6px;word-break:break-all}
+.error-card .more-link{margin-top:22px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div id="ribbon" hidden></div>
+
+<header id="site-header">
+  <div class="wrap header-in">
+    <a href="#hero" class="lockup-link" id="lockup-header" aria-label="Back to top"></a>
+    <nav id="site-nav" aria-label="Sections" hidden></nav>
+    <a class="fabcity-word" id="hdr-fabcity" href="https://fab.city" target="_blank" rel="noopener">FAB.CITY</a>
+  </div>
+</header>
+
+<main id="main" hidden>
+  <section id="hero" aria-label="Introduction"></section>
+  <section id="data" aria-label="Data snapshot" hidden></section>
+  <section id="ecosystem" class="section" hidden></section>
+  <section id="projects" class="section" hidden></section>
+  <section id="news" class="section" hidden></section>
+  <section id="events" class="section" hidden></section>
+</main>
+
+<footer id="site-footer" hidden>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="f-brand">
+        <div id="lockup-footer"></div>
+        <p class="claim">Prototyping locally productive, globally connected futures.</p>
+      </div>
+      <div class="f-col" id="f-local"></div>
+      <div class="f-col" id="f-network"></div>
+    </div>
+    <div class="footer-bottom">
+      <p id="f-bottomline"></p>
+      <span class="fabcity-word" aria-hidden="true">FAB.CITY</span>
+    </div>
+  </div>
+</footer>
+
+<div id="error-view" hidden></div>
+<noscript>
+  <div id="error-view" style="display:grid">
+    <div class="error-card"><h1>This page needs JavaScript</h1>
+    <p>City pages in the Fab City Network render their content from a shared data file, which requires JavaScript. Please enable it and reload.</p></div>
+  </div>
+</noscript>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════════════
+   NETWORK LINKS — managed by the Fab City Foundation.
+   Identical on every city site. Cities never edit these.
+   ════════════════════════════════════════════════════════════════════ */
+const NETWORK_LINKS = {
+  fabcity: "https://fab.city",
+  index_profile: "https://index.fab.city/",
+  blog: "https://blog.fab.city",
+  community: "https://www.hylo.com/groups/fab-city-network/discussions",
+  planetai: "https://planetai.fab.city"
+};
+/* Foundation: the public template repository and the hosted city.json checker. */
+const TEMPLATE_REPO = "https://github.com/fabcity/city-site-template";
+const VALIDATOR_URL = "https://fabcity.github.io/city-site-template/validate.html";
+
+/* Network-type → color, exactly as on the fab.city network map.
+   Every piece stays monochromatic in its one color (2026 naming rules). */
+const FAB_COLORS = { red:"#E62038", green:"#00A057", blue:"#20388D", black:"#1E1E1E" };
+const TYPE_META = {
+  city:    { color:"red",   label:"Fab City" },
+  region:  { color:"green", label:"Fab Region" },
+  country: { color:"black", label:"Fab Country" },
+  island:  { color:"blue",  label:"Fab Island" }
+};
+const INK = "#1E1E1E", PAPER = "#F7F5F1";
+
+/* ── FAB CITY master mark: exact 2026 vector geometry ─────────────── */
+const MARK_TOP  = "M230.399 132.068V46.5094C230.399 44.7275 229.452 43.0863 227.905 42.1954L155.982 0.668205C154.444 -0.222735 152.54 -0.222735 151.002 0.668205L79.0708 42.1954C77.5328 43.0863 76.5762 44.7275 76.5762 46.5094V132.068L150.993 89.1057C152.531 88.2147 154.435 88.2147 155.973 89.1057L230.39 132.068H230.399Z";
+const MARK_RIGHT= "M153.496 265.175L227.594 307.95C229.132 308.841 231.036 308.841 232.574 307.95L304.506 266.423C306.044 265.532 307 263.891 307 262.109V179.054C307 177.272 306.053 175.631 304.506 174.74L230.417 132.06V217.89C230.417 219.672 229.47 221.313 227.922 222.204L153.505 265.166L153.496 265.175Z";
+const MARK_LEFT = "M153.495 265.173L79.3968 307.947C77.8587 308.838 75.9549 308.838 74.4169 307.947L2.49463 266.429C0.94721 265.539 0 263.897 0 262.115V179.061C0 177.279 0.94721 175.638 2.49463 174.747L76.5833 132.066V217.897C76.5833 219.679 77.5305 221.32 79.0779 222.211L153.495 265.173Z";
+const MARK_TEXT = "M131.728 153.376H119.161V147.909H133.913V140.237H110.674V174.628H119.161V161.057H131.728V153.376Z M144.822 140.237L133.493 174.628H142.149L144.522 166.75H154.632L157.005 174.628H165.848L154.66 140.237H144.822ZM152.503 159.36H146.604L149.53 149.278L152.494 159.36H152.503Z M195.508 160.654C194.983 159.604 194.317 158.722 193.52 158.056C192.732 157.39 191.86 156.903 190.922 156.593C191.72 156.293 192.423 155.824 193.014 155.214C193.623 154.586 194.12 153.77 194.477 152.814C194.833 151.866 195.011 150.703 195.011 149.362C195.011 146.643 194.177 144.411 192.526 142.751C190.876 141.081 188.559 140.237 185.642 140.237H168.921V174.628H187.115C188.437 174.628 189.675 174.356 190.8 173.83C191.917 173.305 192.892 172.574 193.708 171.664C194.514 170.754 195.152 169.676 195.612 168.447C196.062 167.228 196.287 165.915 196.287 164.546C196.287 163.027 196.015 161.723 195.48 160.654H195.508ZM177.427 160.954H185.098C185.886 160.954 186.477 161.151 186.918 161.564C187.34 161.967 187.546 162.539 187.546 163.308V164.921C187.546 165.69 187.34 166.262 186.918 166.665C186.486 167.078 185.886 167.275 185.098 167.275H177.427V160.954ZM186.355 151.407C186.355 152.185 186.149 152.767 185.736 153.189C185.314 153.611 184.733 153.808 183.954 153.808H177.427V147.581H183.954C184.733 147.581 185.314 147.787 185.736 148.199C186.158 148.622 186.355 149.203 186.355 149.981V151.407Z M119.863 213.275C115.877 213.275 112.754 211.933 110.484 209.242C108.215 206.55 107.08 202.649 107.08 197.528C107.08 194.968 107.371 192.717 107.952 190.767C108.534 188.816 109.378 187.175 110.484 185.834C111.591 184.493 112.932 183.489 114.517 182.804C116.102 182.12 117.884 181.782 119.863 181.782C122.507 181.782 124.73 182.354 126.521 183.508C128.313 184.661 129.71 186.368 130.732 188.628L126.587 190.898C126.062 189.444 125.255 188.291 124.167 187.428C123.079 186.575 121.645 186.143 119.872 186.143C117.518 186.143 115.671 186.95 114.33 188.553C112.988 190.157 112.323 192.38 112.323 195.212V199.854C112.323 202.686 112.988 204.909 114.33 206.513C115.671 208.117 117.518 208.923 119.872 208.923C121.701 208.923 123.192 208.454 124.346 207.507C125.499 206.56 126.343 205.35 126.896 203.859L130.863 206.26C129.841 208.464 128.416 210.189 126.587 211.427C124.758 212.665 122.517 213.284 119.863 213.284V213.275Z M133.727 212.749V208.735H137.872V186.302H133.727V182.288H146.997V186.302H142.805V208.735H146.997V212.749H133.727Z M163.163 186.659V212.759H158.23V186.659H149.151V182.298H163.163ZM163.163 186.659H172.241V182.298H163.163V186.659Z M184.415 212.749V200.745L173.939 182.288H179.566L186.985 195.859H187.116L194.487 182.288H199.899L189.339 200.66V212.749H184.406H184.415Z";
+const MARK_HEX  = "M153.5 89.1L230.4 132.1V217.9L153.5 265.2L76.6 217.9V132.1Z";
+const MARK_W = 307, MARK_H = 309;
+
+/* ── helpers ──────────────────────────────────────────────────────── */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const arr = x => Array.isArray(x) ? x : [];
+function host(u){ try { return new URL(u).hostname.replace(/^www\./,""); } catch(e){ return esc(u); } }
+function initials(name){
+  const w = String(name||"").trim().split(/\s+/).filter(Boolean);
+  return w.slice(0,2).map(x => x[0]).join("").toUpperCase() || "•";
+}
+function parseDate(iso){ return new Date(iso + "T12:00:00"); }
+function todayISO(){ const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+const fmtDate = d => new Intl.DateTimeFormat(undefined, {day:"numeric", month:"short", year:"numeric"}).format(d);
+const fmtMonth = d => new Intl.DateTimeFormat(undefined, {month:"short"}).format(d).replace(".","").toUpperCase();
+
+/* ── mark + 2-degree lockup, generated from city.name ─────────────── */
+function markGroup(top, right, left, text, knockout){
+  return (knockout ? '<path d="'+MARK_HEX+'" fill="'+knockout+'"/>' : "")
+    + '<path d="'+MARK_TOP+'" fill="'+top+'"/>'
+    + '<path d="'+MARK_RIGHT+'" fill="'+right+'"/>'
+    + '<path d="'+MARK_LEFT+'" fill="'+left+'"/>'
+    + '<path d="'+MARK_TEXT+'" fill="'+text+'"/>';
+}
+function markSVG(tone, label){
+  return '<svg viewBox="0 0 '+MARK_W+' '+MARK_H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+esc(label||"Fab City")+'">' + markGroup(tone, tone, tone, tone) + "</svg>";
+}
+const measCtx = document.createElement("canvas").getContext("2d");
+function nameWidth(t, fs){
+  measCtx.font = "500 " + fs + 'px "Funnel Sans", Arial, sans-serif';
+  return measCtx.measureText(t).width;
+}
+/* 2° naming plate — the outlined union of TWO module hexagons, placed one
+   module height below the mark's core hexagon (geometry measured from the
+   official FC naming lockups). The mark is drawn on top, covering the seam. */
+const HEXW = 153.82, HEXH = 176.07;
+function plateUnion(x1, y){
+  const w2 = HEXW/2, h2 = HEXH/2, h4 = HEXH/4, x2 = x1 + HEXW;
+  return "M" + [[x1,y-h2],[x1+w2,y-h4],[x2,y-h2],[x2+w2,y-h4],[x2+w2,y+h4],[x2,y+h2],[x1+w2,y+h4],[x1,y+h2],[x1-w2,y+h4],[x1-w2,y-h4]]
+    .map(p => p[0].toFixed(2)+" "+p[1].toFixed(2)).join("L") + "Z";
+}
+const NAME_FONT = '"Funnel Sans", Arial, sans-serif';
+function fitName(t, max, fs0){ const w = nameWidth(t, fs0); return w > max ? Math.max(18, fs0*max/w) : fs0; }
+/* layout "inline": mark + name to the side (slim header application).
+   layout "stacked": the full 2° lockup — mark + outlined naming plate,
+   name in Funnel Sans Medium, sentence case, never uppercased. */
+function lockupSVG(name, tone, layout, label){
+  const t = String(name||"");
+  const aria = esc((label||"Fab City") + " " + t);
+  if(layout === "inline"){
+    const fs = fitName(t, 640, 112), gap = 46;
+    const W = Math.ceil(MARK_W + gap + nameWidth(t, fs)) + 6;
+    return '<svg viewBox="0 0 '+W+" "+MARK_H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+aria+'">'
+      + markGroup(tone, tone, tone, tone)
+      + '<text x="'+(MARK_W+gap)+'" y="'+(MARK_H/2)+'" dy="0.35em" fill="'+tone+'" font-family=\''+NAME_FONT+'\' font-weight="500" font-size="'+fs.toFixed(1)+'">'+esc(t)+"</text></svg>";
+  }
+  const cy = 353.23, fs = fitName(t, 252, 54);
+  return '<svg viewBox="-2 -2 390 447" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+aria+'">'
+    + '<path d="'+plateUnion(153.5, cy)+'" fill="none" stroke="'+tone+'" stroke-width="2.4" stroke-linejoin="round"/>'
+    + '<text x="230.41" y="'+cy+'" text-anchor="middle" dy="0.34em" fill="'+tone+'" font-family=\''+NAME_FONT+'\' font-weight="500" font-size="'+fs.toFixed(1)+'">'+esc(t)+"</text>"
+    + markGroup(tone, tone, tone, tone) + "</svg>";
+}
+function setFavicon(){
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 307 309">' + markGroup(FAB_COLORS.red, FAB_COLORS.green, FAB_COLORS.blue, INK, PAPER) + "</svg>";
+  let l = document.querySelector('link[rel="icon"]');
+  if(!l){ l = document.createElement("link"); l.rel = "icon"; l.type = "image/svg+xml"; document.head.appendChild(l); }
+  l.href = "data:image/svg+xml," + encodeURIComponent(svg);
+}
+
+/* ── shared fragments ─────────────────────────────────────────────── */
+function hexDot(solid){
+  return '<svg class="hexdot" viewBox="0 0 20 23" aria-hidden="true"><path d="M10 1.5 18.5 6.6V16.4L10 21.5 1.5 16.4V6.6Z" '
+    + (solid ? 'fill="var(--city)"' : 'fill="none" stroke="var(--city)" stroke-width="2.6"') + "/></svg>";
+}
+function moreLink(url, label){
+  return '<a class="more-link" href="'+esc(url)+'" target="_blank" rel="noopener">'+esc(label)+' <span class="arr" aria-hidden="true">&#8599;</span></a>';
+}
+
+/* ── view switch (grid/map, list/calendar) ── */
+function viewSwitch(id, views, active){
+  return '<div class="viewswitch" role="group" id="'+id+'">'
+    + views.map(v => '<button type="button" data-view="'+v[0]+'" aria-pressed="'+(v[0]===active)+'">'+esc(v[1])+"</button>").join("") + "</div>";
+}
+function bindSwitch(id, onChange){
+  const el = $("#"+id); if(!el) return;
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if(!b) return;
+    el.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    onChange(b.dataset.view);
+  });
+}
+
+/* ── ecosystem map — Leaflet, loaded only when the map view opens ── */
+let leafletP = null, ecoMap = null;
+function loadLeaflet(){
+  if(leafletP) return leafletP;
+  leafletP = new Promise((res, rej) => {
+    const css = document.createElement("link");
+    css.rel = "stylesheet"; css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    css.integrity = "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="; css.crossOrigin = "";
+    document.head.appendChild(css);
+    const s = document.createElement("script");
+    s.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    s.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="; s.crossOrigin = "";
+    s.onload = () => res(window.L); s.onerror = () => rej(new Error("Leaflet failed to load"));
+    document.head.appendChild(s);
+  });
+  return leafletP;
+}
+function popupCard(o){
+  return '<div class="pop-card">'+(o.type ? '<span class="tag tag--city">'+esc(o.type)+"</span>" : "")
+    + '<p class="pop-name">'+esc(o.name)+"</p>"
+    + (o.url ? moreLink(o.url, host(o.url)) : "")+"</div>";
+}
+function showEcoMap(){
+  const box = $("#eco-map");
+  loadLeaflet().then(Lf => {
+    if(ecoMap){ setTimeout(() => ecoMap.invalidateSize(), 0); return; }
+    const pts = arr(DATA.ecosystem).filter(o => isFinite(o.lat) && isFinite(o.lng));
+    ecoMap = Lf.map(box, { scrollWheelZoom: false });
+    Lf.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom: 19
+    }).addTo(ecoMap);
+    const icon = Lf.divIcon({ className: "hexpin",
+      html: '<svg viewBox="0 0 20 23" width="26" height="30"><path d="M10 1 19 6.75V16.25L10 22 1 16.25V6.75Z" fill="'+TONE+'" stroke="'+PAPER+'" stroke-width="1.2"/></svg>',
+      iconSize: [26,30], iconAnchor: [13,15], popupAnchor: [0,-17] });
+    pts.forEach(o => Lf.marker([o.lat, o.lng], { icon: icon, title: o.name, alt: o.name }).addTo(ecoMap).bindPopup(popupCard(o)));
+    if(pts.length) ecoMap.fitBounds(Lf.latLngBounds(pts.map(o => [o.lat, o.lng])).pad(0.3));
+    setTimeout(() => ecoMap.invalidateSize(), 0);
+  }).catch(() => { box.innerHTML = '<p class="map-fail">The map could not load. Check your connection and reload.</p>'; });
+}
+
+/* ── renderers ────────────────────────────────────────────────────── */
+let DATA = null, TONE = FAB_COLORS.red, TYPE_LABEL = "Fab City";
+const L = k => (DATA && DATA.ui_labels && DATA.ui_labels[k]) || {
+  nav_ecosystem:"Ecosystem", nav_projects:"Projects", nav_news:"News", nav_events:"Events",
+  part_of_network:"Part of the Fab City Network",
+  network_since:"In the network since", cta_explore:"Explore the ecosystem",
+  visit_local_site:"Visit our full website",
+  read_more:"Read more", contact:"Contact",
+  view_grid:"Grid", view_map:"Map", view_list:"List", view_calendar:"Calendar",
+  show_past:"Show past events", show_upcoming:"Show upcoming events",
+  today:"Today", no_events_month:"No events this month.", privacy:"Privacy",
+  sample_notice:"Sample content. This city page is not live yet."
+}[k] || k;
+
+function renderLockups(){
+  if(!DATA) return;
+  $("#lockup-header").innerHTML = lockupSVG(DATA.city.name, TONE, "inline", TYPE_LABEL);
+  $("#lockup-footer").innerHTML = lockupSVG(DATA.city.name, PAPER, "stacked", TYPE_LABEL);
+}
+
+function renderHero(c, visibleSections){
+  const tags = ['<span class="tag">'+esc(c.country)+"</span>"];
+  if(c.joined_year) tags.push('<span class="tag tag--city">'+esc(L("network_since"))+" "+esc(c.joined_year)+"</span>");
+  const ctas = [];
+  const target = visibleSections.includes("ecosystem") ? "ecosystem" : visibleSections[0];
+  if(target) ctas.push('<a class="btn btn-solid" href="#'+target+'">'+esc(L("cta_explore"))+' <span class="arr" aria-hidden="true">&#8595;</span></a>');
+  if(c.local_site_url){
+    ctas.push('<a class="btn btn-ghost" href="'+esc(c.local_site_url)+'" target="_blank" rel="noopener">'+esc(L("visit_local_site"))+' <span class="arr" aria-hidden="true">&#8599;</span></a>');
+  } else {
+    const email = DATA.contact && DATA.contact.email;
+    if(email) ctas.push('<a class="btn btn-ghost" href="mailto:'+esc(email)+'">'+esc(L("contact"))+"</a>");
+  }
+  const visual = c.hero_image
+    ? '<img class="hex-img" src="'+esc(c.hero_image)+'" alt="'+esc(TYPE_LABEL + " " + c.name)+'" onerror="this.outerHTML=\'<div class=&quot;hex-ph&quot;>'+esc(initials(c.name))+'</div>\'">'
+    : '<div class="hex-ph" aria-hidden="true">'+esc(initials(c.name))+"</div>";
+  $("#hero").innerHTML = '<div class="wrap hero-grid"><div class="hero-copy">'
+    + '<div class="tags-row">'+tags.join("")+"</div>"
+    + '<h1 class="hero-name">'+esc(c.name)+"</h1>"
+    + '<p class="hero-differential">'+esc(c.differential)+"</p>"
+    + (c.description ? '<p class="hero-desc">'+esc(c.description)+"</p>" : "")
+    + (ctas.length ? '<div class="cta-row">'+ctas.join("")+"</div>" : "")
+    + '</div><div class="hero-visual"><div class="hex-back" aria-hidden="true"></div>'+visual+"</div></div>";
+}
+
+function renderStats(items){
+  const el = $("#data");
+  items = arr(items).slice(0,6);
+  if(!items.length){ el.hidden = true; return; }
+  el.innerHTML = '<div class="wrap"><div class="stats-grid" role="list">'
+    + items.map(s => '<div class="stat" role="listitem"><div class="stat-module"><span class="stat-value">'+esc(s.value)+'</span></div><span class="stat-label">'+esc(s.label)+"</span></div>").join("")
+    + "</div></div>";
+  el.hidden = false;
+}
+
+function sectionShell(id, title, body, extra){
+  const el = $("#"+id);
+  el.innerHTML = '<div class="wrap"><header class="sec-head"><h2 id="'+id+'-title">'+esc(title)+"</h2>"+(extra || "")+"</header>"+body+"</div>";
+  el.setAttribute("aria-labelledby", id+"-title");
+  el.hidden = false;
+}
+
+function renderEcosystem(items){
+  if(!items.length){ $("#ecosystem").hidden = true; return; }
+  const cards = items.map(o => {
+    const mark = '<span class="org-mark"><span class="ph-hex" aria-hidden="true">'+esc(initials(o.name))+"</span>"
+      + (o.logo ? '<img src="'+esc(o.logo)+'" alt="'+esc(o.name)+' logo" loading="lazy" onerror="this.remove()">' : "")
+      + "</span>";
+    return '<article class="org-card"><div class="org-top">'+mark+(o.type ? '<span class="tag">'+esc(o.type)+"</span>" : "")+"</div>"
+      + '<h3 class="org-name">'+esc(o.name)+"</h3>"
+      + (o.summary ? '<p class="org-sum">'+esc(o.summary)+"</p>" : "")
+      + (o.url ? moreLink(o.url, host(o.url)) : "")
+      + "</article>";
+  }).join("");
+  const hasGeo = items.some(o => isFinite(o.lat) && isFinite(o.lng));
+  const sw = hasGeo ? viewSwitch("eco-switch", [["grid", L("view_grid")], ["map", L("view_map")]], "grid") : "";
+  sectionShell("ecosystem", L("nav_ecosystem"),
+    '<div class="org-grid" id="eco-grid">'+cards+"</div>"
+    + (hasGeo ? '<div id="eco-map" role="region" aria-label="'+esc(L("nav_ecosystem"))+' map" hidden></div>' : ""), sw);
+  bindSwitch("eco-switch", v => {
+    $("#eco-grid").hidden = v === "map";
+    $("#eco-map").hidden = v !== "map";
+    if(v === "map") showEcoMap();
+  });
+}
+
+function renderProjects(items){
+  if(!items.length){ $("#projects").hidden = true; return; }
+  const cards = items.map(p => {
+    const solid = /activ|aktiv/i.test(String(p.status||""));
+    const media = '<div class="proj-media"><div class="ph-cut" aria-hidden="true">'+esc(initials(p.title))+"</div>"
+      + (p.image ? '<img src="'+esc(p.image)+'" alt="'+esc(p.title)+'" loading="lazy" onerror="this.remove()">' : "")
+      + "</div>";
+    return '<article class="proj-card">'+media+'<div class="proj-body">'
+      + (p.status ? '<div><span class="tag tag--city">'+hexDot(solid)+esc(p.status)+"</span></div>" : "")
+      + '<h3 class="proj-title">'+esc(p.title)+"</h3>"
+      + (p.summary ? '<p class="proj-sum">'+esc(p.summary)+"</p>" : "")
+      + (arr(p.partners).length ? '<p class="proj-partners">'+arr(p.partners).map(esc).join(" &middot; ")+"</p>" : '<span style="flex-grow:1"></span>')
+      + (p.url ? moreLink(p.url, L("read_more")) : "")
+      + "</div></article>";
+  }).join("");
+  sectionShell("projects", L("nav_projects"), '<div class="proj-grid">'+cards+"</div>");
+}
+
+function renderNews(items){
+  items = arr(items).filter(n => n && n.date && n.title)
+    .sort((a,b) => a.date > b.date ? -1 : a.date < b.date ? 1 : 0).slice(0,6);
+  if(!items.length){ $("#news").hidden = true; return; }
+  const rows = items.map(n => {
+    const title = n.url ? '<a href="'+esc(n.url)+'" target="_blank" rel="noopener">'+esc(n.title)+' <span aria-hidden="true">&#8599;</span></a>' : esc(n.title);
+    return '<li class="news-item"><time class="news-date" datetime="'+esc(n.date)+'">'+fmtDate(parseDate(n.date))+"</time>"
+      + '<div><h3 class="news-title">'+title+"</h3>"+(n.summary ? '<p class="news-sum">'+esc(n.summary)+"</p>" : "")+"</div></li>";
+  }).join("");
+  sectionShell("news", L("nav_news"), '<ol class="news-list">'+rows+"</ol>");
+}
+
+function eventRow(e){
+  const d = parseDate(e.date), yearNow = new Date().getFullYear();
+  const mon = fmtMonth(d) + (d.getFullYear() !== yearNow ? " " + d.getFullYear() : "");
+  return '<li class="event-item"><time class="event-date" datetime="'+esc(e.date)+'">'
+    + '<span class="hexday">'+d.getDate()+'</span><span class="event-mon">'+esc(mon)+"</span></time>"
+    + '<div class="event-info"><h3 class="event-title">'+esc(e.title)+"</h3>"
+    + (e.venue ? '<p class="event-venue">'+esc(e.venue)+"</p>" : "")+"</div>"
+    + (e.url ? moreLink(e.url, host(e.url)) : "")
+    + "</li>";
+}
+const EV = { all: [], past: false, cal: null };
+function renderEvents(items){
+  EV.all = arr(items).filter(e => e && e.date && e.title).sort((a,b) => a.date < b.date ? -1 : 1);
+  if(!EV.all.length){ $("#events").hidden = true; return; }
+  EV.past = !EV.all.some(e => e.date >= todayISO());
+  EV.cal = new Date(); EV.cal.setDate(1);
+  const sw = viewSwitch("ev-switch", [["list", L("view_list")], ["calendar", L("view_calendar")]], "list");
+  sectionShell("events", L("nav_events"),
+    '<div id="ev-list"><ol class="events-list" id="ev-ol"></ol>'
+    + '<p style="margin-top:20px"><button type="button" class="linkbtn" id="ev-past"></button></p></div>'
+    + '<div id="ev-cal" hidden></div>', sw);
+  bindSwitch("ev-switch", v => {
+    $("#ev-list").hidden = v !== "list";
+    $("#ev-cal").hidden = v !== "calendar";
+    if(v === "calendar") drawCal();
+  });
+  $("#ev-past").addEventListener("click", () => { EV.past = !EV.past; drawEvList(); });
+  drawEvList();
+}
+function drawEvList(){
+  const today = todayISO();
+  const up = EV.all.filter(e => e.date >= today);
+  const past = EV.all.filter(e => e.date < today).reverse();
+  const shown = EV.past ? past : up;
+  $("#ev-ol").innerHTML = shown.map(eventRow).join("");
+  const btn = $("#ev-past");
+  btn.textContent = EV.past ? L("show_upcoming") : L("show_past");
+  btn.hidden = !(EV.past ? up.length : past.length);
+}
+function drawCal(){
+  const box = $("#ev-cal"), y = EV.cal.getFullYear(), m = EV.cal.getMonth();
+  const monthName = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(EV.cal);
+  const ym = y + "-" + String(m+1).padStart(2, "0");
+  const monthEvents = EV.all.filter(e => e.date.slice(0,7) === ym);
+  const byDay = {};
+  monthEvents.forEach(e => { const d = +e.date.slice(8,10); (byDay[d] = byDay[d] || []).push(e); });
+  const startCol = (new Date(y, m, 1).getDay() + 6) % 7;   /* Monday-first */
+  const dim = new Date(y, m+1, 0).getDate(), dimPrev = new Date(y, m, 0).getDate();
+  const now = new Date(), isThisMonth = now.getFullYear() === y && now.getMonth() === m;
+  const dowFmt = new Intl.DateTimeFormat(undefined, { weekday: "short" });
+  let cells = "";
+  for(let i = 0; i < 7; i++) cells += '<div class="cal-dow">'+esc(dowFmt.format(new Date(2024, 0, i+1)).replace(".", ""))+"</div>";
+  const total = Math.ceil((startCol + dim) / 7) * 7;
+  for(let i = 0; i < total; i++){
+    const day = i - startCol + 1;
+    if(day < 1 || day > dim){
+      cells += '<div class="cal-cell out" aria-hidden="true"><span class="d">'+(day < 1 ? dimPrev + day : day - dim)+"</span></div>";
+    } else {
+      const evs = byDay[day] || [];
+      const cls = "cal-cell" + (isThisMonth && now.getDate() === day ? " today" : "") + (evs.length ? " has" : "");
+      cells += '<div class="'+cls+'"><span class="d">'+day+"</span>"
+        + evs.map(e => '<span class="cal-chip">'+esc(e.title)+"</span>").join("") + "</div>";
+    }
+  }
+  box.innerHTML = '<div class="ev-toolbar"><h3 class="cal-title">'+esc(monthName)+"</h3>"
+    + '<div class="cal-nav">'
+    + '<button type="button" class="navbtn" id="cal-prev" aria-label="Previous month">&#8592;</button>'
+    + '<button type="button" class="linkbtn" id="cal-today">'+esc(L("today"))+"</button>"
+    + '<button type="button" class="navbtn" id="cal-next" aria-label="Next month">&#8594;</button></div></div>'
+    + '<div class="cal-grid">'+cells+"</div>"
+    + (monthEvents.length ? '<ol class="events-list" style="margin-top:26px">'+monthEvents.map(eventRow).join("")+"</ol>"
+       : '<p class="cal-empty">'+esc(L("no_events_month"))+"</p>");
+  $("#cal-prev").addEventListener("click", () => { EV.cal = new Date(y, m-1, 1); drawCal(); });
+  $("#cal-next").addEventListener("click", () => { EV.cal = new Date(y, m+1, 1); drawCal(); });
+  $("#cal-today").addEventListener("click", () => { EV.cal = new Date(); EV.cal.setDate(1); drawCal(); });
+}
+
+function renderNav(visibleSections){
+  const nav = $("#site-nav");
+  const labels = { ecosystem:"nav_ecosystem", projects:"nav_projects", news:"nav_news", events:"nav_events" };
+  const links = visibleSections.map(id => '<a href="#'+id+'">'+esc(L(labels[id]))+"</a>").join("");
+  nav.innerHTML = links;
+  nav.hidden = !links;
+}
+
+function renderFooter(data){
+  const c = data.contact || {};
+  const local = ['<h3>'+esc(L("contact"))+"</h3>"];
+  if(c.email) local.push('<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+"</a>");
+  arr(c.social).filter(s => s && s.url).forEach(s => local.push('<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.label || host(s.url))+"</a>"));
+  $("#f-local").innerHTML = local.join("");
+  $("#f-network").innerHTML = "<h3>Fab City Network</h3>"
+    + '<a href="'+NETWORK_LINKS.fabcity+'" target="_blank" rel="noopener">Fab City</a>'
+    + '<a href="'+NETWORK_LINKS.index_profile+'" target="_blank" rel="noopener">Fab City Index</a>'
+    + '<a href="'+NETWORK_LINKS.blog+'" target="_blank" rel="noopener">Fab City Blog</a>'
+    + '<a href="'+NETWORK_LINKS.community+'" target="_blank" rel="noopener">Join on Hylo</a>'
+    + '<a href="'+NETWORK_LINKS.planetai+'" target="_blank" rel="noopener">PLANETAI</a>';
+  const priv = data.analytics && data.analytics.privacy_url;
+  $("#f-bottomline").innerHTML = esc(L("part_of_network"))
+    + ' &middot; <a href="'+TEMPLATE_REPO+'" target="_blank" rel="noopener">Fork this site on GitHub</a>'
+    + (priv ? ' &middot; <a href="'+esc(priv)+'" target="_blank" rel="noopener">'+esc(L("privacy"))+"</a>" : "");
+  $("#site-footer").hidden = false;
+}
+
+/* ── analytics — optional, privacy-first (schema 1.1) ──────────────
+   Loads Plausible ONLY when the site is live (is_sample:false) AND city.json
+   provides BOTH analytics.plausible_domain and a public analytics.privacy_url.
+   Cookieless. Cities remain responsible for their local privacy compliance. */
+let analyticsDone = false;
+function loadAnalytics(data){
+  const a = data.analytics || {};
+  if(analyticsDone || data.is_sample !== false || !a.plausible_domain || !a.privacy_url) return;
+  analyticsDone = true;
+  const s = document.createElement("script");
+  s.defer = true; s.src = "https://plausible.io/js/script.js";
+  s.setAttribute("data-domain", String(a.plausible_domain));
+  document.head.appendChild(s);
+}
+
+/* ── boot ─────────────────────────────────────────────────────────── */
+function renderAll(data){
+  if(!data || !data.city || !data.city.name) throw new Error("city.json is missing required city fields");
+  DATA = data;
+  const meta = TYPE_META[data.city.type] || TYPE_META.city;
+  TONE = FAB_COLORS[meta.color]; TYPE_LABEL = meta.label;
+  if(ecoMap){ ecoMap.remove(); ecoMap = null; }
+  document.documentElement.style.setProperty("--city", TONE);
+  document.title = TYPE_LABEL + " " + data.city.name + (data.city.country ? " \u00b7 " + data.city.country : "");
+  let md = document.querySelector('meta[name="description"]');
+  if(md) md.content = data.city.description || data.city.differential || md.content;
+  setFavicon();
+  const ribbon = $("#ribbon"), sample = data.is_sample !== false;
+  if(sample) ribbon.textContent = L("sample_notice");
+  ribbon.hidden = !sample;
+  const eco = arr(data.ecosystem), proj = arr(data.projects);
+  const newsAll = arr(data.news).filter(n => n && n.date && n.title);
+  const evAll = arr(data.events).filter(e => e && e.date && e.title);
+  const visible = [];
+  if(eco.length) visible.push("ecosystem");
+  if(proj.length) visible.push("projects");
+  if(newsAll.length) visible.push("news");
+  if(evAll.length) visible.push("events");
+  renderNav(visible);
+  renderHero(data.city, visible);
+  renderStats(data.data_snapshot);
+  renderEcosystem(eco);
+  renderProjects(proj);
+  renderNews(data.news);
+  renderEvents(data.events);
+  renderFooter(data);
+  loadAnalytics(data);
+  renderLockups();
+  document.fonts && document.fonts.ready && document.fonts.ready.then(renderLockups);
+  $("#main").hidden = false;
+  $("#error-view").hidden = true;
+}
+
+function showError(err){
+  $("#main").hidden = true;
+  $("#site-footer").hidden = true;
+  $("#site-nav").hidden = true;
+  $("#ribbon").hidden = true;
+  $("#lockup-header").innerHTML = '<svg viewBox="0 0 307 309" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Fab City" style="height:48px">' + markGroup(INK, INK, INK, INK) + "</svg>";
+  setFavicon();
+  $("#error-view").innerHTML = '<div class="error-card">' + markSVG(INK)
+    + "<h1>This city page could not load its content.</h1>"
+    + "<p>The content file <code>city.json</code> is missing or invalid. If you maintain this page, run the file through the network's checker (no comments, no trailing commas) and commit again.</p>"
+    + "<p>Opening <code>index.html</code> directly from disk? The content file can only load over HTTP \u2014 view the hosted page instead.</p>"
+    + (err && err.message ? "<p><code>" + esc(err.message) + "</code></p>" : "")
+    + moreLink(VALIDATOR_URL, "Check your city.json")
+    + " &nbsp; " + moreLink(NETWORK_LINKS.fabcity, "Go to FAB.CITY")
+    + "</div>";
+  $("#error-view").hidden = false;
+}
+
+/* Test hook: window.__fabcity.render(data) re-renders without a reload. */
+window.__fabcity = { render: d => { try { renderAll(d); } catch(e){ showError(e); } }, get data(){ return DATA; } };
+
+fetch("city.json", { cache: "no-cache" })
+  .then(r => { if(!r.ok) throw new Error("HTTP " + r.status + " while fetching city.json"); return r.json(); })
+  .then(renderAll)
+  .catch(showError);
+</script>
+</body>
+</html>
