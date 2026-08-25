@@ -32,7 +32,7 @@ You only need a free GitHub account and a web browser.
 4. **Upload your images.** Open the `assets` folder → **Add file → Upload files** → drag your photos in → commit. Make sure filenames in `city.json` match exactly (e.g. `assets/hero.jpg`).
 5. **Publish with GitHub Pages.** In your fork: **Settings → Pages → Source: Deploy from a branch → Branch: `main`, folder `/ (root)` → Save.** After a minute your site is live at `https://YOURNAME.github.io/city-site-template/`. This is your working preview — check it after every change.
 6. **Replace every piece of sample content**, then set `"is_sample": false`. Until then the page shows a "Sample content" ribbon on purpose.
-7. **Request your subdomain** (active members): submit the [subdomain request form](SUBDOMAIN_FORM_URL) with your city name, desired subdomain and your GitHub Pages address. The Foundation reviews it and creates the DNS record — you'll hear back within 10 working days, usually faster.
+7. **Request your subdomain** (active members): submit the [subdomain request form](https://airtable.com/appEQIJOvZOf8urci/pagVZURLwyu5BtYQl/form) with your city name, desired subdomain and your GitHub Pages address. The Foundation reviews it and creates the DNS record — you'll hear back within 10 working days, usually faster.
 8. **Connect the subdomain.** When the Foundation confirms, go to **Settings → Pages → Custom domain**, enter `yourcity.fab.city`, save, and once the check passes tick **Enforce HTTPS**. GitHub issues the certificate automatically. You're live.
 
 ## Editing guide
