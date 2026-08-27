@@ -18,8 +18,10 @@
 <style>
 /* ════════════════════════════════════════════════════════════════════
    FAB CITY IDENTITY TOKENS — 2026 Core Guidelines.
-   Fixed across all city sites. Exactly five colors, two typefaces.
-   The single city color is set at runtime from city.json → theme.color.
+   Fixed across all city sites: exactly five colors, and Funnel Sans as the
+   single typeface (display + text) since the Circular license blocked
+   redistribution — see CHANGELOG 1.1.0.
+   The single city color is set at runtime from city.json → city.type.
    ════════════════════════════════════════════════════════════════════ */
 :root{
   --fab-black:    #1E1E1E;   /* primary logo, key typography, nav */
@@ -120,6 +122,9 @@ a:hover{color:var(--fab-black);text-decoration-color:var(--city);text-decoration
 
 /* ── hero ─────────────────────────────────────────────────────────── */
 #hero{
+  /* clips the decorative .hex-back overhang, which otherwise pushed the page
+     3px wide (horizontal scrollbar) on 358–380px viewports — iPhone SE/mini. */
+  overflow:hidden;
   padding-block:clamp(48px,7vw,92px);
   background-image:
     repeating-linear-gradient(90deg,var(--grid-line) 0 1px,transparent 1px 64px),
@@ -239,7 +244,10 @@ a.leaflet-popup-close-button{color:var(--fab-black)!important}
 .cal-cell .d{display:inline-grid;place-items:center;min-width:24px;height:27px}
 .cal-cell.today .d{clip-path:var(--hexclip);background:var(--fab-black);color:var(--fab-offwhite)}
 .cal-cell.has .d{clip-path:var(--hexclip);background:var(--city);color:var(--fab-offwhite)}
-.cal-chip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;font:600 10.5px/1.35 var(--font-text);letter-spacing:.02em;color:var(--city)}
+/* chip text is FAB Black, not the city color: at 10.5px the city colors sit
+   between 3.1:1 and 4.2:1 on paper (AA normal text needs 4.5:1). The color cue
+   is already carried by the day hexagon behind it. */
+.cal-chip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;font:600 10.5px/1.35 var(--font-text);letter-spacing:.02em;color:var(--fab-black)}
 .cal-empty{padding:18px 0;font-size:14px;color:var(--ink-muted)}
 @media (max-width:640px){.cal-cell{min-height:46px;padding:5px 6px}.cal-chip{display:none}}
 
@@ -281,14 +289,14 @@ a.leaflet-popup-close-button{color:var(--fab-black)!important}
 <header id="site-header">
   <div class="wrap header-in">
     <a href="#hero" class="lockup-link" id="lockup-header" aria-label="Back to top"></a>
-    <nav id="site-nav" aria-label="Sections" hidden></nav>
+    <nav id="site-nav" hidden></nav>
     <a class="fabcity-word" id="hdr-fabcity" href="https://fab.city" target="_blank" rel="noopener">FAB.CITY</a>
   </div>
 </header>
 
 <main id="main" hidden>
-  <section id="hero" aria-label="Introduction"></section>
-  <section id="data" aria-label="Data snapshot" hidden></section>
+  <section id="hero"></section>
+  <section id="data" hidden></section>
   <section id="ecosystem" class="section" hidden></section>
   <section id="projects" class="section" hidden></section>
   <section id="news" class="section" hidden></section>
@@ -300,7 +308,7 @@ a.leaflet-popup-close-button{color:var(--fab-black)!important}
     <div class="footer-grid">
       <div class="f-brand">
         <div id="lockup-footer"></div>
-        <p class="claim">Prototyping locally productive, globally connected futures.</p>
+        <p class="claim" id="f-claim"></p>
       </div>
       <div class="f-col" id="f-local"></div>
       <div class="f-col" id="f-network"></div>
@@ -433,8 +441,8 @@ function moreLink(url, label){
 }
 
 /* ── view switch (grid/map, list/calendar) ── */
-function viewSwitch(id, views, active){
-  return '<div class="viewswitch" role="group" id="'+id+'">'
+function viewSwitch(id, views, active, label){
+  return '<div class="viewswitch" role="group" id="'+id+'" aria-label="'+esc(label)+'">'
     + views.map(v => '<button type="button" data-view="'+v[0]+'" aria-pressed="'+(v[0]===active)+'">'+esc(v[1])+"</button>").join("") + "</div>";
 }
 function bindSwitch(id, onChange){
@@ -498,8 +506,26 @@ const L = k => (DATA && DATA.ui_labels && DATA.ui_labels[k]) || {
   view_grid:"Grid", view_map:"Map", view_list:"List", view_calendar:"Calendar",
   show_past:"Show past events", show_upcoming:"Show upcoming events",
   today:"Today", no_events_month:"No events this month.", privacy:"Privacy",
-  sample_notice:"Sample content. This city page is not live yet."
+  sample_notice:"Sample content. This city page is not live yet.",
+  /* the rest of the page chrome, so a translated site has no English left in it */
+  claim:"Prototyping locally productive, globally connected futures.",
+  network_zone:"Fab City Network", fork_cta:"Fork this site on GitHub",
+  skip_to_content:"Skip to content",
+  aria_top:"Back to top", aria_sections:"Sections",
+  aria_intro:"Introduction", aria_data:"Data snapshot",
+  aria_prev_month:"Previous month", aria_next_month:"Next month"
 }[k] || k;
+
+/* One place where every static string in the shell picks up its label. */
+function applyChromeLabels(data){
+  document.documentElement.lang = (data.city && data.city.language) || "en";
+  $(".skip-link").textContent = L("skip_to_content");
+  $("#lockup-header").setAttribute("aria-label", L("aria_top"));
+  $("#site-nav").setAttribute("aria-label", L("aria_sections"));
+  $("#hero").setAttribute("aria-label", L("aria_intro"));
+  $("#data").setAttribute("aria-label", L("aria_data"));
+  $("#f-claim").textContent = L("claim");
+}
 
 function renderLockups(){
   if(!DATA) return;
@@ -561,7 +587,7 @@ function renderEcosystem(items){
       + "</article>";
   }).join("");
   const hasGeo = items.some(o => isFinite(o.lat) && isFinite(o.lng));
-  const sw = hasGeo ? viewSwitch("eco-switch", [["grid", L("view_grid")], ["map", L("view_map")]], "grid") : "";
+  const sw = hasGeo ? viewSwitch("eco-switch", [["grid", L("view_grid")], ["map", L("view_map")]], "grid", L("nav_ecosystem")) : "";
   sectionShell("ecosystem", L("nav_ecosystem"),
     '<div class="org-grid" id="eco-grid">'+cards+"</div>"
     + (hasGeo ? '<div id="eco-map" role="region" aria-label="'+esc(L("nav_ecosystem"))+' map" hidden></div>' : ""), sw);
@@ -618,7 +644,7 @@ function renderEvents(items){
   if(!EV.all.length){ $("#events").hidden = true; return; }
   EV.past = !EV.all.some(e => e.date >= todayISO());
   EV.cal = new Date(); EV.cal.setDate(1);
-  const sw = viewSwitch("ev-switch", [["list", L("view_list")], ["calendar", L("view_calendar")]], "list");
+  const sw = viewSwitch("ev-switch", [["list", L("view_list")], ["calendar", L("view_calendar")]], "list", L("nav_events"));
   sectionShell("events", L("nav_events"),
     '<div id="ev-list"><ol class="events-list" id="ev-ol"></ol>'
     + '<p style="margin-top:20px"><button type="button" class="linkbtn" id="ev-past"></button></p></div>'
@@ -668,9 +694,9 @@ function drawCal(){
   }
   box.innerHTML = '<div class="ev-toolbar"><h3 class="cal-title">'+esc(monthName)+"</h3>"
     + '<div class="cal-nav">'
-    + '<button type="button" class="navbtn" id="cal-prev" aria-label="Previous month">&#8592;</button>'
+    + '<button type="button" class="navbtn" id="cal-prev" aria-label="'+esc(L("aria_prev_month"))+'">&#8592;</button>'
     + '<button type="button" class="linkbtn" id="cal-today">'+esc(L("today"))+"</button>"
-    + '<button type="button" class="navbtn" id="cal-next" aria-label="Next month">&#8594;</button></div></div>'
+    + '<button type="button" class="navbtn" id="cal-next" aria-label="'+esc(L("aria_next_month"))+'">&#8594;</button></div></div>'
     + '<div class="cal-grid">'+cells+"</div>"
     + (monthEvents.length ? '<ol class="events-list" style="margin-top:26px">'+monthEvents.map(eventRow).join("")+"</ol>"
        : '<p class="cal-empty">'+esc(L("no_events_month"))+"</p>");
@@ -693,7 +719,7 @@ function renderFooter(data){
   if(c.email) local.push('<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+"</a>");
   arr(c.social).filter(s => s && s.url).forEach(s => local.push('<a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.label || host(s.url))+"</a>"));
   $("#f-local").innerHTML = local.join("");
-  $("#f-network").innerHTML = "<h3>Fab City Network</h3>"
+  $("#f-network").innerHTML = "<h3>" + esc(L("network_zone")) + "</h3>"
     + '<a href="'+NETWORK_LINKS.fabcity+'" target="_blank" rel="noopener">Fab City</a>'
     + '<a href="'+NETWORK_LINKS.index_profile+'" target="_blank" rel="noopener">Fab City Index</a>'
     + '<a href="'+NETWORK_LINKS.blog+'" target="_blank" rel="noopener">Fab City Blog</a>'
@@ -701,7 +727,7 @@ function renderFooter(data){
     + '<a href="'+NETWORK_LINKS.planetai+'" target="_blank" rel="noopener">PLANETAI</a>';
   const priv = data.analytics && data.analytics.privacy_url;
   $("#f-bottomline").innerHTML = esc(L("part_of_network"))
-    + ' &middot; <a href="'+TEMPLATE_REPO+'" target="_blank" rel="noopener">Fork this site on GitHub</a>'
+    + ' &middot; <a href="'+TEMPLATE_REPO+'" target="_blank" rel="noopener">'+esc(L("fork_cta"))+"</a>"
     + (priv ? ' &middot; <a href="'+esc(priv)+'" target="_blank" rel="noopener">'+esc(L("privacy"))+"</a>" : "");
   $("#site-footer").hidden = false;
 }
@@ -727,6 +753,7 @@ function renderAll(data){
   DATA = data;
   const meta = TYPE_META[data.city.type] || TYPE_META.city;
   TONE = FAB_COLORS[meta.color]; TYPE_LABEL = meta.label;
+  applyChromeLabels(data);
   if(ecoMap){ ecoMap.remove(); ecoMap = null; }
   document.documentElement.style.setProperty("--city", TONE);
   document.title = TYPE_LABEL + " " + data.city.name + (data.city.country ? " \u00b7 " + data.city.country : "");

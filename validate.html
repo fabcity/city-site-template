@@ -41,8 +41,12 @@ input[type=url]:focus,textarea:focus{outline:2px solid var(--fab-black);outline-
 .or{color:var(--ink-muted);font-size:13px;text-transform:uppercase;letter-spacing:.09em;text-align:center;margin:18px 0}
 #result{margin-top:8px}
 .verdict{display:flex;align-items:center;gap:14px;padding:18px 22px;font-weight:600;font-size:17px}
-.verdict.ok{background:var(--fab-green);color:var(--fab-offwhite);clip-path:var(--cut-sm)}
-.verdict.bad{background:var(--fab-red);color:var(--fab-offwhite);clip-path:var(--cut-sm)}
+/* Verdict sits on FAB Black with the designation color as the signal bar.
+   Off-white on green was 3.13:1 and on red 4.17:1 at 17px — both under AA's
+   4.5:1 for normal text. On black it is 15.3:1 and the color cue survives. */
+.verdict.ok,.verdict.bad{background:var(--fab-black);color:var(--fab-offwhite);clip-path:var(--cut-sm);border-left:10px solid}
+.verdict.ok{border-left-color:var(--fab-green)}
+.verdict.bad{border-left-color:var(--fab-red)}
 ul.findings{list-style:none;margin:16px 0 0;padding:0}
 ul.findings li{padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;display:flex;gap:10px}
 ul.findings li .m{flex:none;font-weight:700}
@@ -93,7 +97,8 @@ a:hover{text-decoration-color:var(--fab-red)}
   <footer>
     Part of the <a href="https://fab.city" target="_blank" rel="noopener">Fab City Network</a> ·
     <a href="https://github.com/fabcity/city-site-template" target="_blank" rel="noopener">Template repository</a> ·
-    Checks match the repository's automatic commit check.
+    Same rules as the repository's automatic commit check, plus a reminder while
+    <code>is_sample</code> is still true.
   </footer>
 </div>
 
@@ -111,12 +116,19 @@ const isStr = v => typeof v === "string";
 const isArr = v => Array.isArray(v);
 const dateRe = /^\d{4}-\d{2}-\d{2}$/;
 
-/* Same rules as scripts/validate.js in the template repository. */
+/* Same rules as scripts/validate.js in the template repository.
+   ponytail: the rules are duplicated here on purpose — this page stays a single
+   self-contained file a city can even save locally, which is the whole point of
+   a zero-setup checker. scripts/consistency-test.js fails in CI if the two
+   copies ever diverge. Factor them into one shared file only if that test
+   starts catching real drift more than once. */
 function validateData(d){
   const errors = [], warns = [];
   const req = (c, m) => { if(!c) errors.push(m); };
   const warn = (c, m) => { if(!c) warns.push(m); };
   req(isStr(d.schema_version), 'schema_version must be a string like "1.1"');
+  if (isStr(d.schema_version))
+    req(["1.0","1.1"].includes(d.schema_version), 'schema_version must be "1.0" or "1.1"');
   req(d.city && typeof d.city === "object", "city block is required");
   if (d.city) {
     req(isStr(d.city.name) && d.city.name.trim(), "city.name is required");
@@ -124,6 +136,12 @@ function validateData(d){
       req(["city","region","country","island"].includes(d.city.type), "city.type must be city, region, country or island");
     if (d.city.subdomain !== undefined)
       req(/^[a-z0-9-]*$/.test(d.city.subdomain), "city.subdomain must be lowercase letters, numbers, hyphens");
+    if (d.city.joined_year !== undefined)
+      req(Number.isInteger(d.city.joined_year) && d.city.joined_year >= 2011,
+          "city.joined_year must be a whole number 2011 or later, with no quotes around it");
+    if (d.city.language !== undefined)
+      req(isStr(d.city.language) && /^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$/.test(d.city.language),
+          'city.language must be a language code like "hr" or "pt-BR"');
     warn(isStr(d.city.differential) && d.city.differential.trim(), "city.differential is empty — it is the most important line on the page");
   }
   if (d.is_sample !== undefined) req(typeof d.is_sample === "boolean", "is_sample must be true or false (no quotes)");

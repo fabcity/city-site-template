@@ -19,6 +19,8 @@ function req(cond, msg){ if(!cond) errors.push(msg); }
 function warn(cond, msg){ if(!cond) warns.push(msg); }
 
 req(isStr(d.schema_version), "schema_version must be a string like \"1.1\"");
+if (isStr(d.schema_version))
+  req(["1.0","1.1"].includes(d.schema_version), "schema_version must be \"1.0\" or \"1.1\"");
 req(d.city && typeof d.city === "object", "city block is required");
 if (d.city) {
   req(isStr(d.city.name) && d.city.name.trim(), "city.name is required");
@@ -26,6 +28,12 @@ if (d.city) {
     req(["city","region","country","island"].includes(d.city.type), "city.type must be city, region, country or island");
   if (d.city.subdomain !== undefined)
     req(/^[a-z0-9-]*$/.test(d.city.subdomain), "city.subdomain must be lowercase letters, numbers, hyphens");
+  if (d.city.joined_year !== undefined)
+    req(Number.isInteger(d.city.joined_year) && d.city.joined_year >= 2011,
+        "city.joined_year must be a whole number 2011 or later, with no quotes around it");
+  if (d.city.language !== undefined)
+    req(isStr(d.city.language) && /^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$/.test(d.city.language),
+        "city.language must be a language code like \"hr\" or \"pt-BR\"");
   warn(isStr(d.city.differential) && d.city.differential.trim(), "city.differential is empty — it is the most important line on the page");
 }
 if (d.is_sample !== undefined) req(typeof d.is_sample === "boolean", "is_sample must be true or false (no quotes)");

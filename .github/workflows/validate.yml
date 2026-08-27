@@ -8,4 +8,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: node scripts/validate.js
+      # Cities: this is the step that puts a ✓ or ✗ on your commits.
+      - name: Check city.json
+        run: node scripts/validate.js
+      # Foundation only: fails if city.schema.json, the two validators and
+      # index.html drift apart. Nothing a city edits can break it.
+      - name: Check the validators agree with the schema
+        run: node scripts/consistency-test.js
