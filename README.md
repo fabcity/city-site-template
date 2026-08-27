@@ -6,6 +6,8 @@ The template ships filled with **sample content for Fab City Zagreb** so you can
 
 Using the template is **optional**. It exists so any member can have a strong, recognizable, accessible site in an afternoon — and so the network looks like a network. See [Two ways to use it](#two-ways-to-use-it) if you already have a website or want to build your own.
 
+Check the template here: https://fabcity.github.io/city-site-template/
+
 ## How it works
 
 - **`index.html`** — the site itself. Design, logo, layout, behavior. Managed by the Foundation. **Never edit it** (one small exception below).
