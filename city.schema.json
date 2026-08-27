@@ -60,6 +60,11 @@
         "local_site_url": {
           "type": "string",
           "description": "Optional. Your existing full website; adds a 'Visit our full website' button to the hero."
+        },
+        "language": {
+          "type": "string",
+          "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$",
+          "description": "Optional. BCP-47 code of the language you wrote the page in (\"hr\", \"pt-BR\"). Sets the page's lang attribute so screen readers and browser translation treat it correctly. Defaults to \"en\"."
         }
       }
     },
@@ -99,7 +104,7 @@
     },
     "data_snapshot": {
       "type": "array",
-      "maxItems": 6,
+      "description": "Only the first 6 entries are rendered. Extra entries are a warning, not an error.",
       "items": {
         "type": "object",
         "required": [
